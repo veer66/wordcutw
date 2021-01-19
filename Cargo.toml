@@ -1,0 +1,20 @@
+[package]
+name = "wordcutw"
+version = "0.1.0"
+authors = ["Vee Satayamas <5ssgdxltv@relay.firefox.com>"]
+edition = "2018"
+
+description = "A C-interface wrapper for Wordcut - a Lao/Thai word segmentation/breaking library"
+documentation = "https://github.com/veer66/wordcutw/blob/master/README.md"
+homepage = "https://github.com/veer66/wordcutw"
+repository = "https://github.com/veer66/wordcutw"
+readme = "README.md"
+keywords = ["text", "nlp", "lao", "thai", "library", "c"]
+license = "LGPL-3.0"
+
+[dependencies]
+wordcut-engine = "0.1.1"
+chamkho = "0.3.1"
+
+[lib]
+crate-type = ["cdylib"]
