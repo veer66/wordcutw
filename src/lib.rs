@@ -1,4 +1,4 @@
-use std::{ffi::{c_void, CStr}, mem::forget, os::raw::c_char, path::Path, ptr};
+use std::{ffi::CStr, mem::forget, os::raw::c_char, path::Path, ptr};
 
 #[repr(C)]
 #[derive(PartialEq, Clone, Debug)]
@@ -7,44 +7,55 @@ pub struct TextRange {
     pub e: usize,
 }
 
-fn  wordcut_new_with_dict_path(path: &Path) -> *const c_void {
+#[repr(C)]
+#[derive(PartialEq, Clone, Debug)]
+pub struct Wordcut {
+}
+
+fn  wordcut_new_with_dict_path(path: &Path) -> *mut Wordcut {
     match wordcut_engine::load_dict(path) {
         Ok(dict) => {
 	    let wordcut = wordcut_engine::Wordcut::new(dict);
             let boxed_wordcut = Box::new(wordcut);
-            Box::into_raw(boxed_wordcut) as *const c_void
+            Box::into_raw(boxed_wordcut) as *mut Wordcut
         }
         Err(e) => {
             eprintln!("{}", e);
-            return ptr::null();
+            return ptr::null::<Wordcut>() as *mut Wordcut
         }
     }
 }
 
-pub extern "C" fn wordcut_new_with_dict(path: *const c_char) -> *const c_void {
+#[no_mangle]
+pub extern "C" fn wordcut_new_with_dict(path: *const c_char) -> *mut Wordcut {
     let path = unsafe { CStr::from_ptr(path) }.to_str().unwrap();
     let path = Path::new(path);
     wordcut_new_with_dict_path(path)
 }
 
-pub extern "C" fn wordcut_new_with_dict_from_default_dir(path: *const c_char) -> *const c_void {
+#[no_mangle]
+pub extern "C" fn wordcut_new_with_dict_from_default_dir(path: *const c_char) -> *mut Wordcut {
     let path = unsafe { CStr::from_ptr(path) }.to_str().unwrap();
     let path = chamkho::cargo_dir().join(path);
     wordcut_new_with_dict_path(&path)
 }
 
-pub extern "C" fn delete_wordcut(wordcut: *const c_void) {
-    let wordcut: *const wordcut_engine::Wordcut = wordcut as *const wordcut_engine::Wordcut;
-    drop(wordcut);
+#[no_mangle]
+pub extern "C" fn delete_wordcut(wordcut: *mut Wordcut) {
+    unsafe {
+	Box::from_raw(wordcut as *mut wordcut_engine::Wordcut);
+    }
 }
 
+#[no_mangle]
 pub extern "C" fn delete_text_ranges(text_ranges: *mut TextRange, range_count: usize) {
     unsafe {
 	Vec::from_raw_parts(text_ranges, range_count, range_count)
     };
 }
 
-pub extern "C" fn wordcut_into_text_ranges(wordcut: *const c_void, text: *const c_char, range_count: *mut usize) -> *mut TextRange {
+#[no_mangle]
+pub extern "C" fn wordcut_into_text_ranges(wordcut: *const Wordcut, text: *const c_char, range_count: *mut usize) -> *mut TextRange {
     let wordcut: *const wordcut_engine::Wordcut = wordcut as *const wordcut_engine::Wordcut;    
     let text = unsafe { CStr::from_ptr(text) }.to_str().unwrap();
     let text_ranges = unsafe { (*wordcut).segment(text) };
