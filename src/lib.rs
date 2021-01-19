@@ -99,6 +99,20 @@ pub extern "C" fn wordcut_into_strings(
     return p;
 }
 
+#[no_mangle]
+pub extern "C" fn wordcut_put_delimiters(
+    wordcut: *const Wordcut,
+    text: *const c_char,
+    delim: *const c_char,
+) -> *mut c_char {
+    let wordcut: *const wordcut_engine::Wordcut = wordcut as *const wordcut_engine::Wordcut;
+    let text = unsafe { CStr::from_ptr(text) }.to_str().unwrap();
+    let delim = unsafe { CStr::from_ptr(delim) }.to_str().unwrap();
+    let segmented_text = unsafe { (*wordcut).put_delimiters(text, delim) };
+    let p = CString::new(segmented_text).unwrap().into_raw();
+    return p;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -137,6 +151,21 @@ mod tests {
                 .unwrap();
             assert_eq!(s0, "ลา");
             assert_eq!(s1, "กา");
+        }
+        delete_wordcut(wordcut);
+    }
+
+    #[test]
+    fn test_wordcut_put_delimiters() {
+        let text = CString::new("ลากา").unwrap().into_raw();
+        let delim = CString::new("---").unwrap().into_raw();
+        let wordcut = wordcut_new_with_dict_from_default_dir(
+            CString::new("data/thai.txt").unwrap().into_raw(),
+        );
+        let segmented_text = wordcut_put_delimiters(wordcut, text, delim);
+        unsafe {
+            let s = CStr::from_ptr(segmented_text).to_str().unwrap();
+            assert_eq!(s, "ลา---กา");
         }
         delete_wordcut(wordcut);
     }
