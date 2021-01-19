@@ -100,6 +100,14 @@ pub extern "C" fn wordcut_into_strings(
 }
 
 #[no_mangle]
+pub extern "C" fn delete_strings(strings: *mut *mut c_char, string_count: usize) {
+    unsafe {
+        let raw_strings = Vec::from_raw_parts(strings, string_count, string_count);
+        raw_strings.into_iter().for_each(drop);
+    };
+}
+
+#[no_mangle]
 pub extern "C" fn wordcut_put_delimiters(
     wordcut: *const Wordcut,
     text: *const c_char,
@@ -152,6 +160,7 @@ mod tests {
             assert_eq!(s0, "ลา");
             assert_eq!(s1, "กา");
         }
+        delete_strings(segmented_strings, string_count);
         delete_wordcut(wordcut);
     }
 

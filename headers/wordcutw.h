@@ -28,4 +28,6 @@ char **wordcut_into_strings(const struct Wordcut *wordcut,
                             const char *text,
                             uintptr_t *string_count);
 
+void delete_strings(char **strings, uintptr_t string_count);
+
 char *wordcut_put_delimiters(const struct Wordcut *wordcut, const char *text, const char *delim);

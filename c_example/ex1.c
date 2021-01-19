@@ -20,6 +20,7 @@ main()
     {
       printf("String #%zu: %s\n", i, tokenized_strings[i]);
     }
+  delete_strings(tokenized_strings, string_count);
   
   char *tokenized_text = wordcut_put_delimiters(wordcut, "ลากา", "---");
   printf("Tokenized text = %s\n", tokenized_text);
