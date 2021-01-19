@@ -23,3 +23,9 @@ void delete_text_ranges(struct TextRange *text_ranges, uintptr_t range_count);
 struct TextRange *wordcut_into_text_ranges(const struct Wordcut *wordcut,
                                            const char *text,
                                            uintptr_t *range_count);
+
+char **wordcut_into_strings(const struct Wordcut *wordcut,
+                            const char *text,
+                            uintptr_t *string_count);
+
+char *wordcut_put_delimiters(const struct Wordcut *wordcut, const char *text, const char *delim);
