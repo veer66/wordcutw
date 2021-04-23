@@ -2,6 +2,15 @@
 
 A C-interface wrapper for Wordcut - a Lao/Thai word segmentation/breaking library
 
+## Install
+
+```
+git clone git@github.com:veer66/wordcutw.git
+cd wordcutw
+cargo build --release
+sudo cp target/release/libwordcutw.so /usr/local/lib
+```
+
 ## Example
 
 ```C
