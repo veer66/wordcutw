@@ -1,3 +1,5 @@
+# Moved to https://codeberg.org/mekong-lang/wordcutw
+
 # wordcutw
 
 A C-interface wrapper for Wordcut - a Lao/Thai word segmentation/breaking library
